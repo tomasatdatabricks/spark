@@ -1841,7 +1841,17 @@ class FPGrowthTests(SparkSessionTestCase):
         del self.data
 
 
+
 class ImageReaderTest(SparkSessionTestCase):
+
+    def test_ocv_types(self):
+        ocvList = ImageSchema.ocvTypes
+        self.assertEqual("Undefined", ocvList[0].name)
+        self.assertEqual(-1, ocvList[0].mode)
+        self.assertEqual("N/A", ocvList[0].dataType)
+        for x in ocvList:
+            self.assertEqual(x, ImageSchema.ocvTypeByName(x.name))
+            self.assertEqual(x, ImageSchema.ocvTypeByMode(x.mode))
 
     def test_read_images(self):
         data_path = 'data/mllib/images/kittens'
@@ -1852,8 +1862,7 @@ class ImageReaderTest(SparkSessionTestCase):
         self.assertEqual(len(array), first_row[1])
         self.assertEqual(ImageSchema.toImage(array, origin=first_row[0]), first_row)
         self.assertEqual(df.schema, ImageSchema.imageSchema)
-        expected = {'CV_8UC3': 16, 'Undefined': -1, 'CV_8U': 0, 'CV_8UC1': 0, 'CV_8UC4': 24}
-        self.assertEqual(ImageSchema.ocvTypes, expected)
+
         expected = ['origin', 'height', 'width', 'nChannels', 'mode', 'data']
         self.assertEqual(ImageSchema.imageFields, expected)
         self.assertEqual(ImageSchema.undefinedImageType, "Undefined")
